@@ -10,40 +10,38 @@ import ForgeUI, {
   TextField,
   useProductContext,
   useConfig,
-} from "@forge/ui";
-import { useContentProperty } from "@forge/ui-confluence";
-import { EntryData } from "./types";
-import api, { route } from "@forge/api";
+} from '@forge/ui'
+import { useContentProperty } from '@forge/ui-confluence'
+import { EntryData } from './types'
+import api, { route } from '@forge/api'
 
 const SignupView = () => {
-  const { title, fields, ...rest } = useConfig() || {};
+  const { title, fields, ...rest } = useConfig() || {}
   const fieldLabels = fields
-    ? fields.split(",").map(label => label.trim())
+    ? fields.split(',').map((label) => label.trim())
     : Object.entries(rest)
         .sort((a, b) => Number(b.slice(0, -5)) - Number(a.slice(0, -5)))
         .map(([, value]) => value)
-        .filter((label) => label !== "");
-  const { accountId } = useProductContext();
+        .filter((label) => label !== '')
+  const { accountId } = useProductContext()
   const [entries, updateEntries] = useContentProperty<EntryData[]>(
-    "entries",
-    []
-  );
+    'entries',
+    [],
+  )
   const hasSubmitted =
-    entries.find((entry) => entry.accountId === accountId) !== undefined;
+    entries.find((entry) => entry.accountId === accountId) !== undefined
 
   return (
     <Fragment>
       {hasSubmitted ? (
         <Fragment>
-          <Text>
-            {`You have signed up${title ? ` for ${title}` : ""}! ✅`}
-          </Text>
+          <Text>{`You have signed up${title ? ` for ${title}` : ''}! ✅`}</Text>
           <Button
             text="Remove yourself from this list ⛔️"
             onClick={async () => {
               await updateEntries((prev) => {
-                return prev.filter((row) => row.accountId !== accountId);
-              });
+                return prev.filter((row) => row.accountId !== accountId)
+              })
             }}
           />
         </Fragment>
@@ -52,19 +50,21 @@ const SignupView = () => {
           onSubmit={async (formData) => {
             const data = await (
               await api.asUser().requestJira(route`/rest/api/3/myself`)
-            ).json();
-            debugger;
+            ).json()
             await updateEntries((prev) => {
               return [
                 ...prev,
                 { ...formData, name: data.displayName, accountId },
-              ];
-            });
+              ]
+            })
           }}
-          submitButtonText={`Sign up ${title ? `for ${title} ` : ""}🎉`}
+          submitButtonText={`Sign up ${title ? `for ${title} ` : ''}🎉`}
         >
           {fieldLabels.length > 0 && (
-            <Text> "**Please fill in the following information before signing up**" </Text>
+            <Text>
+              {' '}
+              "**Please fill in the following information before signing up**"{' '}
+            </Text>
           )}
           {fieldLabels.map((field) => (
             <TextField name={field} label={field} />
@@ -72,15 +72,14 @@ const SignupView = () => {
         </Form>
       ) : (
         <Button
-          text={`Sign up ${title ? `for ${title} ` : ""}🎉`}
+          text={`Sign up ${title ? `for ${title} ` : ''}🎉`}
           onClick={async () => {
             const data = await (
               await api.asUser().requestJira(route`/rest/api/3/myself`)
-            ).json();
-            debugger;
+            ).json()
             await updateEntries((prev) => {
-              return [...prev, { name: data.displayName, accountId }];
-            });
+              return [...prev, { name: data.displayName, accountId }]
+            })
           }}
         />
       )}
@@ -97,25 +96,29 @@ const SignupView = () => {
                 </Cell>
               ))}
             </Head>
-            {entries.map((entry) => (
-              <Row>
-                <Cell>
-                  <Text>
-                    {`[${entry.name}](/wiki/people/${entry.accountId})`}
-                  </Text>
-                </Cell>
-                {fieldLabels.map((field) => (
+            {entries
+              .filter(function (item, index, array) {
+                return item.accountId === accountId
+              })
+              .map((entry) => (
+                <Row>
                   <Cell>
-                    <Text> {entry[field] || ""} </Text>
+                    <Text>
+                      {`[${entry.name}](/wiki/people/${entry.accountId})`}
+                    </Text>
                   </Cell>
-                ))}
-              </Row>
-            ))}
+                  {fieldLabels.map((field) => (
+                    <Cell>
+                      <Text> {entry[field] || ''} </Text>
+                    </Cell>
+                  ))}
+                </Row>
+              ))}
           </Table>
         </Fragment>
       )}
     </Fragment>
-  );
-};
+  )
+}
 
-export default SignupView;
+export default SignupView

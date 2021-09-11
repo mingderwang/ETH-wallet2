@@ -1,6 +1,6 @@
 {
-  "name": "forge-ui-starter-typescript-experimental",
-  "version": "0.0.0",
+  "name": "eth-wallet2",
+  "version": "0.0.1",
   "main": "index.js",
   "private": true,
   "license": "MIT",
