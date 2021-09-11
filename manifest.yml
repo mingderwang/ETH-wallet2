@@ -1,0 +1,21 @@
+modules:
+  macro:
+    - key: eth-wallet2
+      function: main
+      title: ETH-wallet2
+      description: First Ethereum Wallet in Forge 
+      config:
+        function: config
+  function:
+    - key: main
+      handler: index.run
+    - key: config
+      handler: config.run
+app:
+  id: ari:cloud:ecosystem::app/4835a321-24b9-4229-8cc0-9e056655e084
+permissions:
+  scopes:
+    - "read:me"
+    - "read:confluence-props"
+    - "write:confluence-props"
+    - "read:jira-user"
